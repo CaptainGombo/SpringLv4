@@ -29,15 +29,14 @@ public class BoardService {
 
     //게시글 작성
     @Transactional
-    public BoardResponseDto createBoard(BoardRequestDto requestDto, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
-        if (member == null) {
-            throw new InvalidTokenException("로그인이 필요합니다.");
-        }
+    public BoardResponseDto createBoard(BoardRequestDto requestDto, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
+//        if (member == null) {
+//            throw new InvalidTokenException("로그인이 필요합니다.");
+//        }
 
-        Board board = new Board(requestDto, member);
-
-        return new BoardResponseDto(boardRepository.save(board));
+        Board board = boardRepository.saveAndFlush(new Board(requestDto, member));
+        return new BoardResponseDto(board);
 
 
     }
@@ -61,8 +60,8 @@ public class BoardService {
 
     //게시글 수정
     @Transactional
-    public BoardResponseDto update(Long id, BoardRequestDto requestDto, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
+    public BoardResponseDto update(Long id, BoardRequestDto requestDto, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
@@ -78,8 +77,8 @@ public class BoardService {
 
     //게시글 삭제
     @Transactional
-    public  String deleteBoard(Long id, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
+    public  String deleteBoard(Long id, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
 
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 존재하지 않습니다.")
@@ -89,22 +88,30 @@ public class BoardService {
         return "게시글 삭제 성공.";
     }
 
-    public Member checkJwtToken(HttpServletRequest request){
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-        if(token != null){
-            if(jwtUtil.validateToken(token)){
-                claims = jwtUtil.getUserInfoFromToken(token);
-            }else{
-                throw new InvalidTokenException("Token Error");
-            }
-
-            Member member = memberRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new UnauthorizedUserException("사용자가 존재하지 않습니다")
-            );
-            return member;
-        }else {
-            return null;
+    //작성자 일치 여부 판단
+    private void isPostAuthor(Member member, Board board) {
+        if (!board.getMember().getUsername().equals(member.getUsername())) {
+            if (member.isAdmin()) return;
+            throw new IllegalArgumentException("작성자가 일치하지 않습니다");
         }
     }
+
+//    public Member checkJwtToken(HttpServletRequest request){
+//        String token = jwtUtil.resolveToken(request);
+//        Claims claims;
+//        if(token != null){
+//            if(jwtUtil.validateToken(token)){
+//                claims = jwtUtil.getUserInfoFromToken(token);
+//            }else{
+//                throw new InvalidTokenException("Token Error");
+//            }
+//
+//            Member member = memberRepository.findByUsername(claims.getSubject()).orElseThrow(
+//                    () -> new UnauthorizedUserException("사용자가 존재하지 않습니다")
+//            );
+//            return member;
+//        }else {
+//            return null;
+//        }
+//    }
 }

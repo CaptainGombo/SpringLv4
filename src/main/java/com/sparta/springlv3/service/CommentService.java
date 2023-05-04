@@ -14,7 +14,6 @@ import com.sparta.springlv3.repository.CommentRepository;
 import com.sparta.springlv3.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,12 +31,11 @@ public class CommentService {
 
 
     @Transactional
-    public CommentResponseDto createComment(CommentRequestDto requestDto, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
+    public CommentResponseDto createComment(CommentRequestDto requestDto, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
         if (member == null) {
             throw new IllegalArgumentException("로그인이 필요합니다.");
         }
-
         // 게시글 찾기
         Board board = boardRepository.findById(requestDto.getId()).orElseThrow(() -> new BoardNotFoundException("게시글을 찾을 수 없습니다."));
 
@@ -50,8 +48,8 @@ public class CommentService {
 
     //댓글 수정
     @Transactional
-    public CommentResponseDto updateComment(Long commentid, CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
+    public CommentResponseDto updateComment(Long commentid, CommentRequestDto commentRequestDto, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
 
         if(member == null){
             throw new InvalidTokenException("로그인 하세요.");
@@ -71,8 +69,8 @@ public class CommentService {
 
     //댓글 삭제
     @Transactional
-    public CommentDeleteResponseDto deleteComment(Long commentid, HttpServletRequest request) {
-        Member member = checkJwtToken(request);
+    public CommentDeleteResponseDto deleteComment(Long commentid, HttpServletRequest request, Member member) {
+//        Member member = checkJwtToken(request);
         if(member == null){
             throw new InvalidTokenException("로그인 하세요.");
         }
@@ -89,23 +87,23 @@ public class CommentService {
 
     }
 
-    //토큰 유효 확인
-    public Member checkJwtToken(HttpServletRequest request){
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
-        if(token != null){
-            if(jwtUtil.validateToken(token)){
-                claims = jwtUtil.getUserInfoFromToken(token);
-            }else{
-                throw new IllegalArgumentException("Token Error");
-            }
-
-            Member member = memberRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다")
-            );
-            return member;
-        }else {
-            return null;
-        }
-    }
+//    //토큰 유효 확인
+//    public Member checkJwtToken(HttpServletRequest request){
+//        String token = jwtUtil.resolveToken(request);
+//        Claims claims;
+//        if(token != null){
+//            if(jwtUtil.validateToken(token)){
+//                claims = jwtUtil.getUserInfoFromToken(token);
+//            }else{
+//                throw new IllegalArgumentException("Token Error");
+//            }
+//
+//            Member member = memberRepository.findByUsername(claims.getSubject()).orElseThrow(
+//                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다")
+//            );
+//            return member;
+//        }else {
+//            return null;
+//        }
+//    }
 }

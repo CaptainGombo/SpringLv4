@@ -32,4 +32,10 @@ public class Member {
         this.password = signupRequestDto.getPassword();
         this.role = role;
     }
+
+    public boolean isAdmin() {
+        if (UserRoleEnum.ADMIN == role) return true;
+        return false;
+    }
 }
+

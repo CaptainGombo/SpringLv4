@@ -117,7 +117,4 @@
     - 배포 시 AWS의 RDS를 사용하셨다면 Github에 절대 RDS에 대한 정보를 올리시면 안 됩니다!
     
 
-<aside>
-📌 제출하기 : [https://forms.gle/pnW2Fp4SS6xLQu957](https://forms.gle/pnW2Fp4SS6xLQu957)
 
-</aside>
